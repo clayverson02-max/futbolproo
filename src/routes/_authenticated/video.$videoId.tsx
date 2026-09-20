@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { embedUrlDesde } from "@/lib/video";
 import { useSesion } from "@/hooks/useSesion";
 import { listarVideosLocais } from "@/lib/localVideos";
+import { VIDEOS_CATALOGO } from "@/lib/catalogoVideos";
 
 export const Route = createFileRoute("/_authenticated/video/$videoId")({
   head: () => ({
@@ -31,7 +32,7 @@ function VideoPage() {
   const { data, isLoading } = useQuery({
     queryKey: ["video", videoId],
     queryFn: async () => {
-      const locais = listarVideosLocais();
+      const locais = [...VIDEOS_CATALOGO, ...listarVideosLocais()];
 
       try {
         const { data: video, error } = await supabase
