@@ -1,10 +1,9 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Search, PlayCircle, Clock, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppHeader } from "@/components/AppHeader";
-import { Input } from "@/components/ui/input";
 import { useSesion } from "@/hooks/useSesion";
 
 const DEFAULT_CATEGORIES = [
@@ -68,9 +67,7 @@ export function useVideos() {
 function Dashboard() {
   const { data: sesion } = useSesion();
   const { data: categorias = [] } = useCategorias();
-  const { data: videos = [], isLoading } = useVideos();
-  const [categoriaActiva, setCategoriaActiva] = useState<string | null>(null);
-  const [busqueda, setBusqueda] = useState("");
+  const { data: videos = [] } = useVideos();
 
   const conteos = useMemo(() => {
     const mapa: Record<string, number> = {};
@@ -78,14 +75,7 @@ function Dashboard() {
     return mapa;
   }, [videos]);
 
-  const visibles = useMemo(() => {
-    const texto = busqueda.trim().toLowerCase();
-    return videos.filter(
-      (v) =>
-        (!categoriaActiva || v.categoria_id === categoriaActiva) &&
-        (!texto || v.titulo.toLowerCase().includes(texto)),
-    );
-  }, [videos, categoriaActiva, busqueda]);
+
 
   if (sesion && !sesion.activo) {
     return (
@@ -117,21 +107,12 @@ function Dashboard() {
           <div className="rounded-xl border border-border bg-card p-3"><span className="block text-lg font-bold">0%</span><span className="text-[11px] text-muted-foreground">completado</span></div>
         </div>
 
-        <div className="relative mt-5">
-          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={busqueda}
-            onChange={(e) => setBusqueda(e.target.value)}
-            placeholder="Buscar un video..."
-            className="pl-9"
-          />
-        </div>
 
         <section className="mt-8">
           <div className="mb-4">
             <h2 className="text-lg font-bold tracking-tight">Biblioteca por categorías</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Entra en una categoría para ver los entrenamientos disponíveis e acompanhar sua evolução.
+              Entra en una categoría para ver los entrenamientos y acompañar tu evolución.
             </p>
           </div>
           <div className="space-y-3">
@@ -160,50 +141,6 @@ function Dashboard() {
           </div>
         </section>
 
-        <section className="mt-8">
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-            {categoriaActiva ? categorias.find((c) => c.id === categoriaActiva)?.nombre : "Todos los videos"}
-          </h2>
-
-          {isLoading ? (
-            <p className="text-sm text-muted-foreground">Cargando videos...</p>
-          ) : visibles.length === 0 ? (
-            <p className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-              Esta categoría está preparada. Los entrenamientos aparecerán aquí cuando se agreguen los enlaces.
-            </p>
-          ) : (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-              {visibles.map((v) => (
-                <Link
-                  key={v.id}
-                  to="/video/$videoId"
-                  params={{ videoId: v.id }}
-                  className="group overflow-hidden rounded-xl border border-border bg-card transition-colors hover:border-primary"
-                >
-                  <div className="relative aspect-video bg-secondary">
-                    {v.thumbnail_url ? (
-                      <img
-                        src={v.thumbnail_url}
-                        alt={v.titulo}
-                        loading="lazy"
-                        className="size-full object-cover"
-                      />
-                    ) : null}
-                    <PlayCircle className="absolute inset-0 m-auto size-9 text-primary opacity-80 transition-opacity group-hover:opacity-100" />
-                  </div>
-                  <div className="p-3">
-                    <p className="line-clamp-2 text-sm font-medium">{v.titulo}</p>
-                    {v.duracion ? (
-                      <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-                        <Clock className="size-3" /> {v.duracion}
-                      </p>
-                    ) : null}
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </section>
       </main>
     </div>
   );
