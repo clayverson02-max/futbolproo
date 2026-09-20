@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Search, PlayCircle, Clock } from "lucide-react";
+import { Search, PlayCircle, Clock, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppHeader } from "@/components/AppHeader";
 import { Input } from "@/components/ui/input";
@@ -101,10 +101,15 @@ function Dashboard() {
     <div className="min-h-screen bg-background">
       <AppHeader />
       <main className="mx-auto max-w-6xl px-4 pb-16 pt-6">
-        <h1 className="text-xl font-bold tracking-tight sm:text-2xl">
-          Hola, {sesion?.nombre ?? "jugador"} 👋
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">Tu biblioteca de entrenamiento organizada para avanzar cada día.</p>
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Tu área de entrenamiento</p>
+          <h1 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
+            Hola, {sesion?.nombre ?? "jugador"} 👋
+          </h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+            Elige una categoría para entrar en tu plan de entrenamiento. Cada área fue organizada para que sepas exactamente qué desarrollar y por dónde empezar.
+          </p>
+        </div>
 
         <div className="mt-5 grid grid-cols-3 gap-2 sm:max-w-md sm:gap-3">
           <div className="rounded-xl border border-border bg-card p-3"><span className="block text-lg font-bold">{categorias.length}</span><span className="text-[11px] text-muted-foreground">categorías</span></div>
@@ -122,23 +127,38 @@ function Dashboard() {
           />
         </div>
 
-        <div className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
-          <CategoriaChip
-            nombre="Todas"
-            cantidad={videos.length}
-            activa={categoriaActiva === null}
-            onClick={() => setCategoriaActiva(null)}
-          />
-          {categorias.map((c) => (
-            <CategoriaChip
-              key={c.id}
-              nombre={c.nombre}
-              cantidad={conteos[c.id] ?? 0}
-              activa={categoriaActiva === c.id}
-              onClick={() => setCategoriaActiva(c.id)}
-            />
-          ))}
-        </div>
+        <section className="mt-8">
+          <div className="mb-4">
+            <h2 className="text-lg font-bold tracking-tight">Biblioteca por categorías</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Entra en una categoría para ver los entrenamientos disponíveis e acompanhar sua evolução.
+            </p>
+          </div>
+          <div className="space-y-3">
+            {categorias.map((c) => (
+              <Link
+                key={c.id}
+                to="/categoria/$slug"
+                params={{ slug: c.slug }}
+                className="group flex items-center gap-3 rounded-2xl border border-border bg-card p-4 transition-all hover:border-primary/70 hover:bg-primary/5 sm:gap-4 sm:p-5"
+              >
+                <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-primary/10 text-2xl sm:size-14">
+                  {categoriasIconos[c.nombre] ?? c.icono ?? "⚽"}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-bold sm:text-base">{c.nombre}</span>
+                  <span className="mt-1 block text-xs leading-5 text-muted-foreground sm:text-sm">
+                    {descripcionCategoria(c.slug, c.nombre)}
+                  </span>
+                  <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary">
+                    {conteos[c.id] ?? 0} {conteos[c.id] === 1 ? "entrenamiento" : "entrenamientos"}
+                  </span>
+                </span>
+                <ArrowRight className="size-5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-primary" />
+              </Link>
+            ))}
+          </div>
+        </section>
 
         <section className="mt-8">
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
@@ -191,29 +211,17 @@ function Dashboard() {
 
 const categoriasIconos: Record<string, string> = Object.fromEntries(DEFAULT_CATEGORIES.map((category) => [category.nombre, category.icono]));
 
-function CategoriaChip({
-  nombre,
-  cantidad,
-  activa,
-  onClick,
-}: {
-  nombre: string;
-  cantidad: number;
-  activa: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`rounded-xl border p-3 text-left transition-colors ${
-        activa
-          ? "border-primary bg-primary/15"
-          : "border-border bg-card hover:border-primary/60"
-      }`}
-    >
-      <span className="mb-2 block text-xl leading-none">{categoriasIconos[nombre] ?? "⚽"}</span><span className="block text-sm font-semibold leading-tight">{nombre}</span>
-      <span className="mt-1 block text-xs text-muted-foreground">{cantidad} videos</span>
-    </button>
-  );
+const descripcionesCategorias: Record<string, string> = {
+  porteros: "Reflejos, posicionamiento y seguridad bajo los tres palos.",
+  laterales: "Velocidad, marca y apoyo para dominar los costados.",
+  "defensas-centrales": "Cobertura, anticipación y salida de balón con confianza.",
+  delanteros: "Finalización, movimientos y definición para marcar más.",
+  "tecnica-individual": "Control, conducción y recursos para jugar con más calidad.",
+  "acondicionamiento-fisico": "Resistencia, fuerza y explosión para rendir durante todo el partido.",
+  "futbol-femenino": "Sesiones pensadas para la evolución de jugadoras.",
+  "futbol-infantil": "Ejercicios claros y dinámicos para desarrollar desde la base.",
+};
+
+function descripcionCategoria(slug: string, nombre: string) {
+  return descripcionesCategorias[slug] ?? `Entrenamientos de ${nombre.toLowerCase()} para avanzar con método.`;
 }
