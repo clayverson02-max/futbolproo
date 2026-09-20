@@ -6,13 +6,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+const LOGIN_USUARIO = "clientepro";
+const LOGIN_EMAIL = "advanceofseals01@gmail.com";
+
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Acceso de miembros | Fútbol Pro" },
-      { name: "description", content: "Inicia sesión para acceder a tu entrenamiento de fútbol por categorías." },
+      { name: "description", content: "Inicia sesión para acceder a tu entrenamiento de fútbol." },
       { property: "og:title", content: "Acceso de miembros | Fútbol Pro" },
-      { property: "og:description", content: "Inicia sesión para acceder a tu entrenamiento de fútbol por categorías." },
+      { property: "og:description", content: "Área exclusiva de miembros de Fútbol Pro." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -22,36 +25,31 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
-  const [modo, setModo] = useState<"login" | "recuperar">("login");
-  const [email, setEmail] = useState("");
+  const [usuario, setUsuario] = useState("");
   const [password, setPassword] = useState("");
   const [cargando, setCargando] = useState(false);
 
   async function entrar(e: React.FormEvent) {
     e.preventDefault();
-    setCargando(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setCargando(false);
-    if (error) {
-      toast.error("No pudimos iniciar sesión. Revisa tu correo y contraseña.");
+
+    if (usuario.trim().toLowerCase() !== LOGIN_USUARIO) {
+      toast.error("Usuário ou senha inválidos.");
       return;
     }
-    navigate({ to: "/dashboard" });
-  }
 
-  async function recuperar(e: React.FormEvent) {
-    e.preventDefault();
     setCargando(true);
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+    const { error } = await supabase.auth.signInWithPassword({
+      email: LOGIN_EMAIL,
+      password,
     });
     setCargando(false);
+
     if (error) {
-      toast.error("No pudimos enviar el correo de recuperación.");
+      toast.error("Usuário ou senha inválidos.");
       return;
     }
-    toast.success("Te enviamos un enlace para restablecer tu contraseña.");
-    setModo("login");
+
+    navigate({ to: "/dashboard" });
   }
 
   return (
@@ -62,79 +60,45 @@ function AuthPage() {
             F
           </span>
           <h1 className="text-2xl font-bold tracking-tight">FÚTBOL PRO</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Área de miembros · entrenamiento por posiciones</p>
+          <p className="mt-1 text-sm text-muted-foreground">Área exclusiva de membros</p>
         </div>
 
         <div className="rounded-2xl border border-border bg-card p-5 shadow-glow">
-          {modo === "login" ? (
-            <form onSubmit={entrar} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Correo electrónico</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="tucorreo@ejemplo.com"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Contraseña</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                />
-              </div>
-              <Button type="submit" className="w-full" disabled={cargando}>
-                {cargando ? "Entrando..." : "Entrar"}
-              </Button>
-              <button
-                type="button"
-                onClick={() => setModo("recuperar")}
-                className="w-full text-center text-sm text-muted-foreground underline-offset-4 hover:text-primary hover:underline"
-              >
-                Olvidé mi contraseña
-              </button>
-            </form>
-          ) : (
-            <form onSubmit={recuperar} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email-rec">Correo electrónico</Label>
-                <Input
-                  id="email-rec"
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="tucorreo@ejemplo.com"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Te enviaremos un enlace para crear una contraseña nueva.
-                </p>
-              </div>
-              <Button type="submit" className="w-full" disabled={cargando}>
-                {cargando ? "Enviando..." : "Enviar enlace"}
-              </Button>
-              <button
-                type="button"
-                onClick={() => setModo("login")}
-                className="w-full text-center text-sm text-muted-foreground underline-offset-4 hover:text-primary hover:underline"
-              >
-                Volver al inicio de sesión
-              </button>
-            </form>
-          )}
+          <form onSubmit={entrar} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="usuario">Login</Label>
+              <Input
+                id="usuario"
+                type="text"
+                autoComplete="username"
+                required
+                value={usuario}
+                onChange={(e) => setUsuario(e.target.value)}
+                placeholder="Digite seu login"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password">Senha</Label>
+              <Input
+                id="password"
+                type="password"
+                autoComplete="current-password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Digite sua senha"
+              />
+            </div>
+
+            <Button type="submit" className="w-full" disabled={cargando}>
+              {cargando ? "Entrando..." : "Entrar"}
+            </Button>
+          </form>
         </div>
 
         <p className="mt-5 text-center text-xs text-muted-foreground">
-          El acceso se crea automáticamente al comprar el programa. ¿Problemas para entrar? Escríbenos.
+          Acesso exclusivo. Em caso de dificuldade, entre em contato com o suporte.
         </p>
       </div>
     </main>
