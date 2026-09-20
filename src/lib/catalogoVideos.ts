@@ -117,7 +117,7 @@ export const VIDEOS_CATALOGO: VideoLocal[] = [
     video_url: "https://www.youtube.com/watch?v=fltqAWyd7qk",
     proveedor: "youtube",
     video_id: "fltqAWyd7qk",
-    thumbnail_url: "https://img.youtube.com/vi/fl tqAWyd7qk/hqdefault.jpg".replace(" ", ""),
+    thumbnail_url: "https://img.youtube.com/vi/fltqAWyd7qk/hqdefault.jpg",
     duracion: null,
     fecha_creacion: "2026-09-20T00:00:00.000Z",
   },
