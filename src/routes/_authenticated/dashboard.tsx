@@ -8,14 +8,14 @@ import { useSesion } from "@/hooks/useSesion";
 import { listarVideosLocais } from "@/lib/localVideos";
 
 const DEFAULT_CATEGORIES = [
-  { id: "default-porteros", nombre: "Porteros", slug: "porteros", orden: 1, icono: "🧤" },
-  { id: "default-laterales", nombre: "Laterales", slug: "laterales", orden: 2, icono: "🏃" },
-  { id: "default-defensas", nombre: "Defensas centrales", slug: "defensas-centrales", orden: 3, icono: "🛡️" },
-  { id: "default-delanteros", nombre: "Delanteros", slug: "delanteros", orden: 4, icono: "🎯" },
-  { id: "default-tecnica", nombre: "Técnica individual", slug: "tecnica-individual", orden: 5, icono: "⚽" },
-  { id: "default-fisico", nombre: "Acondicionamiento físico", slug: "acondicionamiento-fisico", orden: 6, icono: "💪" },
-  { id: "default-femenino", nombre: "Fútbol femenino", slug: "futbol-femenino", orden: 7, icono: "🌟" },
-  { id: "default-infantil", nombre: "Fútbol infantil", slug: "futbol-infantil", orden: 8, icono: "👟" },
+  { id: "11111111-1111-1111-1111-111111111111", nombre: "Porteros", slug: "porteros", orden: 1, icono: "🧤" },
+  { id: "22222222-2222-2222-2222-222222222222", nombre: "Laterales", slug: "laterales", orden: 2, icono: "🏃" },
+  { id: "33333333-3333-3333-3333-333333333333", nombre: "Defensas centrales", slug: "defensas-centrales", orden: 3, icono: "🛡️" },
+  { id: "44444444-4444-4444-4444-444444444444", nombre: "Delanteros", slug: "delanteros", orden: 4, icono: "🎯" },
+  { id: "55555555-5555-5555-5555-555555555555", nombre: "Técnica individual", slug: "tecnica-individual", orden: 5, icono: "⚽" },
+  { id: "66666666-6666-6666-6666-666666666666", nombre: "Acondicionamiento físico", slug: "acondicionamiento-fisico", orden: 6, icono: "💪" },
+  { id: "77777777-7777-7777-7777-777777777777", nombre: "Fútbol femenino", slug: "futbol-femenino", orden: 7, icono: "🌟" },
+  { id: "88888888-8888-8888-8888-888888888888", nombre: "Fútbol infantil", slug: "futbol-infantil", orden: 8, icono: "👟" },
 ];
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
