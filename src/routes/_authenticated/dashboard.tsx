@@ -96,9 +96,8 @@ function Dashboard() {
           </p>
         </div>
 
-        <div className="mt-5 grid grid-cols-3 gap-2 sm:max-w-md sm:gap-3">
+        <div className="mt-5 grid grid-cols-2 gap-2 sm:max-w-xs sm:gap-3">
           <div className="rounded-xl border border-border bg-card p-3"><span className="block text-lg font-bold">{categorias.length}</span><span className="text-[11px] text-muted-foreground">categorías</span></div>
-          <div className="rounded-xl border border-border bg-card p-3"><span className="block text-lg font-bold">{videos.length}</span><span className="text-[11px] text-muted-foreground">entrenamientos</span></div>
           <div className="rounded-xl border border-border bg-card p-3"><span className="block text-lg font-bold">0%</span><span className="text-[11px] text-muted-foreground">completado</span></div>
         </div>
 
@@ -118,6 +117,7 @@ function Dashboard() {
                 params={{ slug: c.slug }}
                 className="group flex items-center gap-3 rounded-2xl border border-border bg-card p-4 transition-all hover:border-primary/70 hover:bg-primary/5 sm:gap-4 sm:p-5"
               >
+                <span className="text-xl">{c.icono ?? "⚽"}</span>
                 <span className="min-w-0 flex-1 text-sm font-bold sm:text-base">{c.nombre}</span>
                 <ArrowRight className="size-5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-primary" />
               </Link>
