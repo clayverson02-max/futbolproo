@@ -47,6 +47,18 @@ const vacio: Formulario = {
   duracion: "",
 };
 
+const CATEGORIAS_PADRAO = [
+  { id: "default-porteros", nombre: "Porteros", slug: "porteros", orden: 1, icono: "🧤" },
+  { id: "default-laterales", nombre: "Laterales", slug: "laterales", orden: 2, icono: "🏃" },
+  { id: "default-defensas", nombre: "Defensas centrales", slug: "defensas-centrales", orden: 3, icono: "🛡️" },
+  { id: "default-delanteros", nombre: "Delanteros", slug: "delanteros", orden: 4, icono: "🎯" },
+  { id: "default-tecnica", nombre: "Técnica individual", slug: "tecnica-individual", orden: 5, icono: "⚽" },
+  { id: "default-fisico", nombre: "Acondicionamiento físico", slug: "acondicionamiento-fisico", orden: 6, icono: "💪" },
+  { id: "default-femenino", nombre: "Fútbol femenino", slug: "futbol-femenino", orden: 7, icono: "🌟" },
+  { id: "default-infantil", nombre: "Fútbol infantil", slug: "futbol-infantil", orden: 8, icono: "👟" },
+];
+
+
 function AdminPage() {
   const { data: sesion, isLoading: cargandoSesion } = useSesion();
   const { data: categorias = [] } = useCategorias();
@@ -100,29 +112,46 @@ function AdminPage() {
       duracion: form.duracion.trim() || null,
     };
 
-    const { error } = form.id
-      ? await supabase.from("videos").update(fila).eq("id", form.id)
-      : await supabase.from("videos").insert(fila);
-    setGuardando(false);
+    try {
+      if (!form.id && form.categoria_id.startsWith("default-")) {
+        const categoriaPadrao = CATEGORIAS_PADRAO.find((item) => item.id === form.categoria_id);
+        if (categoriaPadrao) {
+          const { error: errorCategoria } = await supabase
+            .from("categories")
+            .upsert(categoriaPadrao, { onConflict: "id" });
+          if (errorCategoria) throw errorCategoria;
+        }
+      }
 
-    if (error) {
-      toast.error("No pudimos guardar el video.");
-      return;
+      const resultado = form.id
+        ? await supabase.from("videos").update(fila).eq("id", form.id)
+        : await supabase.from("videos").insert(fila);
+
+      if (resultado.error) throw resultado.error;
+
+      toast.success(form.id ? "Video actualizado." : "Video agregado.");
+      setForm(vacio);
+      await queryClient.invalidateQueries({ queryKey: ["videos"] });
+      await queryClient.invalidateQueries({ queryKey: ["categorias"] });
+    } catch (error) {
+      const detalle = error instanceof Error ? error.message : "Revisa la conexión con el banco de datos.";
+      toast.error(`No pudimos guardar el video: ${detalle.slice(0, 140)}`);
+    } finally {
+      setGuardando(false);
     }
-    toast.success(form.id ? "Video actualizado." : "Video agregado.");
-    setForm(vacio);
-    queryClient.invalidateQueries({ queryKey: ["videos"] });
   }
 
   async function eliminar(id: string) {
-    const { error } = await supabase.from("videos").delete().eq("id", id);
-    if (error) {
-      toast.error("No pudimos eliminar el video.");
-      return;
+    try {
+      const { error } = await supabase.from("videos").delete().eq("id", id);
+      if (error) throw error;
+      toast.success("Video eliminado.");
+      if (form.id === id) setForm(vacio);
+      await queryClient.invalidateQueries({ queryKey: ["videos"] });
+    } catch (error) {
+      const detalle = error instanceof Error ? error.message : "Revisa la conexión con el banco de datos.";
+      toast.error(`No pudimos eliminar el video: ${detalle.slice(0, 140)}`);
     }
-    toast.success("Video eliminado.");
-    if (form.id === id) setForm(vacio);
-    queryClient.invalidateQueries({ queryKey: ["videos"] });
   }
 
   return (
