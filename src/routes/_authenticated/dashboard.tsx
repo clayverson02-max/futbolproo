@@ -36,9 +36,13 @@ export function useCategorias() {
   return useQuery({
     queryKey: ["categorias"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("categories").select("*").order("orden");
-      if (error) throw error;
-      return data?.length ? data : DEFAULT_CATEGORIES;
+      try {
+        const { data, error } = await supabase.from("categories").select("*").order("orden");
+        if (error || !data?.length) return DEFAULT_CATEGORIES;
+        return data;
+      } catch {
+        return DEFAULT_CATEGORIES;
+      }
     },
   });
 }
@@ -47,12 +51,16 @@ export function useVideos() {
   return useQuery({
     queryKey: ["videos"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("videos")
-        .select("*")
-        .order("fecha_creacion", { ascending: false });
-      if (error) throw error;
-      return data;
+      try {
+        const { data, error } = await supabase
+          .from("videos")
+          .select("*")
+          .order("fecha_creacion", { ascending: false });
+        if (error) return [];
+        return data ?? [];
+      } catch {
+        return [];
+      }
     },
   });
 }
