@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppHeader } from "@/components/AppHeader";
 import { useSesion } from "@/hooks/useSesion";
 import { listarVideosLocais } from "@/lib/localVideos";
+import { VIDEOS_CATALOGO } from "@/lib/catalogoVideos";
 
 const DEFAULT_CATEGORIES = [
   { id: "11111111-1111-1111-1111-111111111111", nombre: "Porteros", slug: "porteros", orden: 1, icono: "🧤" },
@@ -57,10 +58,10 @@ export function useVideos() {
           .from("videos")
           .select("*")
           .order("fecha_creacion", { ascending: false });
-        if (error) return locais;
-        return [...locais, ...(data ?? [])];
+        if (error) return [...VIDEOS_CATALOGO, ...locais];
+        return [...VIDEOS_CATALOGO, ...locais, ...(data ?? [])];
       } catch {
-        return locais;
+        return [...VIDEOS_CATALOGO, ...locais];
       }
     },
   });
