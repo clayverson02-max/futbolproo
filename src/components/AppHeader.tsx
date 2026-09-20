@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { LogOut, ShieldCheck } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSesion } from "@/hooks/useSesion";
 
@@ -28,14 +28,6 @@ export function AppHeader() {
         </Link>
 
         <div className="ml-auto flex items-center gap-2">
-          {sesion?.esAdmin ? (
-            <Button asChild variant="secondary" size="sm">
-              <Link to="/admin">
-                <ShieldCheck className="size-4" />
-                <span className="hidden sm:inline">Admin</span>
-              </Link>
-            </Button>
-          ) : null}
           <span className="hidden max-w-[10rem] truncate text-sm text-muted-foreground sm:inline">
             {sesion?.nombre}
           </span>
