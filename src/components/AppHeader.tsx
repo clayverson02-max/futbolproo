@@ -1,19 +1,19 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { LogOut, ShieldCheck } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useSesion } from "@/hooks/useSesion";
+
+const CHAVE_SESSAO = "futbolpro-auth";
 
 export function AppHeader() {
   const { data: sesion } = useSesion();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  async function salir() {
-    await queryClient.cancelQueries();
+  function sair() {
     queryClient.clear();
-    await supabase.auth.signOut();
+    window.sessionStorage.removeItem(CHAVE_SESSAO);
     navigate({ to: "/auth", replace: true });
   }
 
@@ -39,7 +39,7 @@ export function AppHeader() {
           <span className="hidden max-w-[10rem] truncate text-sm text-muted-foreground sm:inline">
             {sesion?.nombre}
           </span>
-          <Button variant="ghost" size="sm" onClick={salir} aria-label="Salir">
+          <Button variant="ghost" size="sm" onClick={sair} aria-label="Salir">
             <LogOut className="size-4" />
             <span className="hidden sm:inline">Salir</span>
           </Button>
