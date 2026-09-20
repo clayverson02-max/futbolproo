@@ -5,6 +5,7 @@ import { ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppHeader } from "@/components/AppHeader";
 import { useSesion } from "@/hooks/useSesion";
+import { listarVideosLocais } from "@/lib/localVideos";
 
 const DEFAULT_CATEGORIES = [
   { id: "default-porteros", nombre: "Porteros", slug: "porteros", orden: 1, icono: "🧤" },
@@ -50,15 +51,17 @@ export function useVideos() {
   return useQuery({
     queryKey: ["videos"],
     queryFn: async () => {
+      const locais = listarVideosLocais();
+
       try {
         const { data, error } = await supabase
           .from("videos")
           .select("*")
           .order("fecha_creacion", { ascending: false });
-        if (error) return [];
-        return data ?? [];
+        if (error) return locais;
+        return [...locais, ...(data ?? [])];
       } catch {
-        return [];
+        return locais;
       }
     },
   });
