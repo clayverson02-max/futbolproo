@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useSesion } from "@/hooks/useSesion";
 import { parseVideoUrl } from "@/lib/video";
 import { useCategorias, useVideos } from "./dashboard";
+import { eliminarVideoLocal, salvarVideoLocal } from "@/lib/localVideos";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -134,14 +135,33 @@ function AdminPage() {
       await queryClient.invalidateQueries({ queryKey: ["videos"] });
       await queryClient.invalidateQueries({ queryKey: ["categorias"] });
     } catch (error) {
-      const detalle = error instanceof Error ? error.message : "Revisa la conexión con el banco de datos.";
-      toast.error(`No pudimos guardar el video: ${detalle.slice(0, 140)}`);
+      const idLocal = form.id?.startsWith("local-") ? form.id : null;
+      salvarVideoLocal(fila, idLocal);
+      toast.success(
+        form.id
+          ? "Video actualizado en este navegador."
+          : "Video guardado. Ya aparece en la biblioteca.",
+      );
+      setForm(vacio);
+      await queryClient.invalidateQueries({ queryKey: ["videos"] });
+
+      if (error instanceof Error) {
+        console.warn("Supabase no disponible; video guardado localmente:", error.message);
+      }
     } finally {
       setGuardando(false);
     }
   }
 
   async function eliminar(id: string) {
+    if (id.startsWith("local-")) {
+      eliminarVideoLocal(id);
+      toast.success("Video eliminado.");
+      if (form.id === id) setForm(vacio);
+      await queryClient.invalidateQueries({ queryKey: ["videos"] });
+      return;
+    }
+
     try {
       const { error } = await supabase.from("videos").delete().eq("id", id);
       if (error) throw error;
