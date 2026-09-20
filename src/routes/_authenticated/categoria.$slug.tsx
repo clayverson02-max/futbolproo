@@ -140,7 +140,7 @@ function CategoriaPage() {
               <span className="text-3xl">{copy.icono}</span>
               <h3 className="mt-3 font-semibold">Esta área ya está preparada</h3>
               <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-                Los entrenamientos de esta categoría aparecerán aquí assim que los enlaces sean agregados.
+                Los entrenamientos de esta categoría aparecerán aquí cuando los enlaces sean agregados.
               </p>
             </div>
           ) : (
