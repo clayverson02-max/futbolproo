@@ -1,24 +1,45 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Button } from "@/components/ui/button";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "Fútbol Pro | Entrenamiento por posiciones" },
+      {
+        name: "description",
+        content: "Área de miembros con entrenamientos de fútbol en video por posición: porteros, defensas, delanteros y más.",
+      },
+      { property: "og:title", content: "Fútbol Pro | Entrenamiento por posiciones" },
+      {
+        property: "og:description",
+        content: "Área de miembros con entrenamientos de fútbol en video por posición: porteros, defensas, delanteros y más.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
+  component: Inicio,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+function Inicio() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <main className="campo-gradient flex min-h-screen flex-col items-center justify-center px-5 text-center">
+      <span className="grid size-14 place-items-center rounded-2xl bg-primary text-3xl font-black text-primary-foreground">
+        F
+      </span>
+      <h1 className="mt-5 text-3xl font-black tracking-tight sm:text-5xl">FÚTBOL PRO</h1>
+      <p className="mt-3 max-w-md text-muted-foreground">
+        Entrenamiento en video por posición: porteros, laterales, centrales, delanteros, técnica, físico,
+        fútbol femenino e infantil.
+      </p>
+      <div className="mt-7 flex gap-3">
+        <Button asChild size="lg">
+          <Link to="/auth">Entrar a mi cuenta</Link>
+        </Button>
+      </div>
+      <p className="mt-6 text-xs text-muted-foreground">
+        El acceso se activa automáticamente tras la compra.
+      </p>
+    </main>
   );
 }
