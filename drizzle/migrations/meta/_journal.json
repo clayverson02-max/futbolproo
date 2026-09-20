@@ -1,5 +1,13 @@
 {
   "version": "7",
   "dialect": "postgresql",
-  "entries": []
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1789871556623,
+      "tag": "0000_plataforma_miembros_futbol",
+      "breakpoints": true
+    }
+  ]
 }
