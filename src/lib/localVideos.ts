@@ -13,6 +13,17 @@ export type VideoLocal = {
 
 const CHAVE_VIDEOS = "futbolpro-videos";
 
+const CATEGORIA_IDS_ANTIGOS: Record<string, string> = {
+  "default-porteros": "11111111-1111-1111-1111-111111111111",
+  "default-laterales": "22222222-2222-2222-2222-222222222222",
+  "default-defensas": "33333333-3333-3333-3333-333333333333",
+  "default-delanteros": "44444444-4444-4444-4444-444444444444",
+  "default-tecnica": "55555555-5555-5555-5555-555555555555",
+  "default-fisico": "66666666-6666-6666-6666-666666666666",
+  "default-femenino": "77777777-7777-7777-7777-777777777777",
+  "default-infantil": "88888888-8888-8888-8888-888888888888",
+};
+
 function gerarId() {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
     return `local-${crypto.randomUUID()}`;
@@ -26,7 +37,10 @@ export function listarVideosLocais(): VideoLocal[] {
   try {
     const salvo = window.localStorage.getItem(CHAVE_VIDEOS);
     const videos = salvo ? JSON.parse(salvo) : [];
-    return Array.isArray(videos) ? videos : [];
+    return (Array.isArray(videos) ? videos : []).map((video) => ({
+      ...video,
+      categoria_id: CATEGORIA_IDS_ANTIGOS[video.categoria_id] ?? video.categoria_id,
+    }));
   } catch {
     return [];
   }
