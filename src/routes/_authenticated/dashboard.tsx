@@ -7,6 +7,17 @@ import { AppHeader } from "@/components/AppHeader";
 import { Input } from "@/components/ui/input";
 import { useSesion } from "@/hooks/useSesion";
 
+const DEFAULT_CATEGORIES = [
+  { id: "default-porteros", nombre: "Porteros", slug: "porteros", orden: 1, icono: "🧤" },
+  { id: "default-laterales", nombre: "Laterales", slug: "laterales", orden: 2, icono: "🏃" },
+  { id: "default-defensas", nombre: "Defensas centrales", slug: "defensas-centrales", orden: 3, icono: "🛡️" },
+  { id: "default-delanteros", nombre: "Delanteros", slug: "delanteros", orden: 4, icono: "🎯" },
+  { id: "default-tecnica", nombre: "Técnica individual", slug: "tecnica-individual", orden: 5, icono: "⚽" },
+  { id: "default-fisico", nombre: "Acondicionamiento físico", slug: "acondicionamiento-fisico", orden: 6, icono: "💪" },
+  { id: "default-femenino", nombre: "Fútbol femenino", slug: "futbol-femenino", orden: 7, icono: "🌟" },
+  { id: "default-infantil", nombre: "Fútbol infantil", slug: "futbol-infantil", orden: 8, icono: "👟" },
+];
+
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
@@ -27,7 +38,7 @@ export function useCategorias() {
     queryFn: async () => {
       const { data, error } = await supabase.from("categories").select("*").order("orden");
       if (error) throw error;
-      return data;
+      return data?.length ? data : DEFAULT_CATEGORIES;
     },
   });
 }
@@ -85,7 +96,13 @@ function Dashboard() {
         <h1 className="text-xl font-bold tracking-tight sm:text-2xl">
           Hola, {sesion?.nombre ?? "jugador"} 👋
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">Elige una categoría y entrena hoy.</p>
+        <p className="mt-1 text-sm text-muted-foreground">Tu biblioteca de entrenamiento organizada para avanzar cada día.</p>
+
+        <div className="mt-5 grid grid-cols-3 gap-2 sm:max-w-md sm:gap-3">
+          <div className="rounded-xl border border-border bg-card p-3"><span className="block text-lg font-bold">{categorias.length}</span><span className="text-[11px] text-muted-foreground">categorías</span></div>
+          <div className="rounded-xl border border-border bg-card p-3"><span className="block text-lg font-bold">{videos.length}</span><span className="text-[11px] text-muted-foreground">entrenamientos</span></div>
+          <div className="rounded-xl border border-border bg-card p-3"><span className="block text-lg font-bold">0%</span><span className="text-[11px] text-muted-foreground">completado</span></div>
+        </div>
 
         <div className="relative mt-5">
           <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -97,7 +114,7 @@ function Dashboard() {
           />
         </div>
 
-        <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+        <div className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
           <CategoriaChip
             nombre="Todas"
             cantidad={videos.length}
@@ -124,7 +141,7 @@ function Dashboard() {
             <p className="text-sm text-muted-foreground">Cargando videos...</p>
           ) : visibles.length === 0 ? (
             <p className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-              Todavía no hay videos aquí. Se irán publicando pronto.
+              Esta categoría está preparada. Los entrenamientos aparecerán aquí cuando se agreguen los enlaces.
             </p>
           ) : (
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
@@ -164,6 +181,8 @@ function Dashboard() {
   );
 }
 
+const categoriasIconos: Record<string, string> = Object.fromEntries(DEFAULT_CATEGORIES.map((category) => [category.nombre, category.icono]));
+
 function CategoriaChip({
   nombre,
   cantidad,
@@ -185,7 +204,7 @@ function CategoriaChip({
           : "border-border bg-card hover:border-primary/60"
       }`}
     >
-      <span className="block text-sm font-semibold leading-tight">{nombre}</span>
+      <span className="mb-2 block text-xl leading-none">{categoriasIconos[nombre] ?? "⚽"}</span><span className="block text-sm font-semibold leading-tight">{nombre}</span>
       <span className="mt-1 block text-xs text-muted-foreground">{cantidad} videos</span>
     </button>
   );
