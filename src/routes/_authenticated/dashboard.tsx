@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight } from "lucide-react";
@@ -72,13 +71,6 @@ function Dashboard() {
   const { data: categorias = [] } = useCategorias();
   const { data: videos = [] } = useVideos();
 
-  const conteos = useMemo(() => {
-    const mapa: Record<string, number> = {};
-    for (const v of videos) mapa[v.categoria_id] = (mapa[v.categoria_id] ?? 0) + 1;
-    return mapa;
-  }, [videos]);
-
-
 
   if (sesion && !sesion.activo) {
     return (
@@ -126,18 +118,7 @@ function Dashboard() {
                 params={{ slug: c.slug }}
                 className="group flex items-center gap-3 rounded-2xl border border-border bg-card p-4 transition-all hover:border-primary/70 hover:bg-primary/5 sm:gap-4 sm:p-5"
               >
-                <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-primary/10 text-2xl sm:size-14">
-                  {categoriasIconos[c.nombre] ?? c.icono ?? "⚽"}
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block text-sm font-bold sm:text-base">{c.nombre}</span>
-                  <span className="mt-1 block text-xs leading-5 text-muted-foreground sm:text-sm">
-                    {descripcionCategoria(c.slug, c.nombre)}
-                  </span>
-                  <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary">
-                    {conteos[c.id] ?? 0} {conteos[c.id] === 1 ? "entrenamiento" : "entrenamientos"}
-                  </span>
-                </span>
+                <span className="min-w-0 flex-1 text-sm font-bold sm:text-base">{c.nombre}</span>
                 <ArrowRight className="size-5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-primary" />
               </Link>
             ))}
@@ -149,19 +130,3 @@ function Dashboard() {
   );
 }
 
-const categoriasIconos: Record<string, string> = Object.fromEntries(DEFAULT_CATEGORIES.map((category) => [category.nombre, category.icono]));
-
-const descripcionesCategorias: Record<string, string> = {
-  porteros: "Reflejos, posicionamiento y seguridad bajo los tres palos.",
-  laterales: "Velocidad, marca y apoyo para dominar los costados.",
-  "defensas-centrales": "Cobertura, anticipación y salida de balón con confianza.",
-  delanteros: "Finalización, movimientos y definición para marcar más.",
-  "tecnica-individual": "Control, conducción y recursos para jugar con más calidad.",
-  "acondicionamiento-fisico": "Resistencia, fuerza y explosión para rendir durante todo el partido.",
-  "futbol-femenino": "Sesiones pensadas para la evolución de jugadoras.",
-  "futbol-infantil": "Ejercicios claros y dinámicos para desarrollar desde la base.",
-};
-
-function descripcionCategoria(slug: string, nombre: string) {
-  return descripcionesCategorias[slug] ?? `Entrenamientos de ${nombre.toLowerCase()} para avanzar con método.`;
-}
