@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 const LOGIN_USUARIO = "clientepro";
-const LOGIN_EMAIL = "advanceofseals01@gmail.com";
+const LOGIN_SENHA = "1234";
+const CHAVE_SESSAO = "futbolpro-auth";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -29,26 +29,19 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [cargando, setCargando] = useState(false);
 
-  async function entrar(e: React.FormEvent) {
+  function entrar(e: React.FormEvent) {
     e.preventDefault();
 
-    if (usuario.trim().toLowerCase() !== LOGIN_USUARIO) {
+    if (
+      usuario.trim().toLowerCase() !== LOGIN_USUARIO ||
+      password !== LOGIN_SENHA
+    ) {
       toast.error("Usuário ou senha inválidos.");
       return;
     }
 
     setCargando(true);
-    const { error } = await supabase.auth.signInWithPassword({
-      email: LOGIN_EMAIL,
-      password,
-    });
-    setCargando(false);
-
-    if (error) {
-      toast.error("Usuário ou senha inválidos.");
-      return;
-    }
-
+    window.sessionStorage.setItem(CHAVE_SESSAO, "true");
     navigate({ to: "/dashboard" });
   }
 
