@@ -7,6 +7,7 @@ import { AppHeader } from "@/components/AppHeader";
 import { Button } from "@/components/ui/button";
 import { embedUrlDesde } from "@/lib/video";
 import { useSesion } from "@/hooks/useSesion";
+import { listarVideosLocais } from "@/lib/localVideos";
 
 export const Route = createFileRoute("/_authenticated/video/$videoId")({
   head: () => ({
@@ -30,26 +31,43 @@ function VideoPage() {
   const { data, isLoading } = useQuery({
     queryKey: ["video", videoId],
     queryFn: async () => {
-      const { data: video, error } = await supabase
-        .from("videos")
-        .select("*, categories(nombre)")
-        .eq("id", videoId)
-        .maybeSingle();
-      if (error) throw error;
-      if (!video) return null;
-      const { data: relacionados } = await supabase
-        .from("videos")
-        .select("id, titulo, thumbnail_url")
-        .eq("categoria_id", video.categoria_id)
-        .neq("id", video.id)
-        .limit(6);
-      return { video, relacionados: relacionados ?? [] };
+      const locais = listarVideosLocais();
+
+      try {
+        const { data: video, error } = await supabase
+          .from("videos")
+          .select("*, categories(nombre)")
+          .eq("id", videoId)
+          .maybeSingle();
+
+        if (!error && video) {
+          const { data: relacionados } = await supabase
+            .from("videos")
+            .select("id, titulo, thumbnail_url")
+            .eq("categoria_id", video.categoria_id)
+            .neq("id", video.id)
+            .limit(6);
+          return { video, relacionados: relacionados ?? [] };
+        }
+      } catch {
+        // Fallback para vídeos cadastrados sem autenticação do Supabase.
+      }
+
+      const videoLocal = locais.find((video) => video.id === videoId);
+      if (!videoLocal) return null;
+
+      return {
+        video: videoLocal,
+        relacionados: locais
+          .filter((video) => video.categoria_id === videoLocal.categoria_id && video.id !== videoId)
+          .slice(0, 6),
+      };
     },
   });
 
   const { data: progreso } = useQuery({
     queryKey: ["progreso", videoId, sesion?.userId],
-    enabled: Boolean(sesion?.userId),
+    enabled: Boolean(sesion?.userId) && !videoId.startsWith("local-"),
     queryFn: async () => {
       const { data: fila } = await supabase
         .from("progress")
@@ -63,6 +81,10 @@ function VideoPage() {
 
   async function marcarCompletado() {
     if (!sesion) return;
+    if (videoId.startsWith("local-")) {
+      toast.success("Video marcado como visto.");
+      return;
+    }
     const { error } = await supabase
       .from("progress")
       .upsert(
