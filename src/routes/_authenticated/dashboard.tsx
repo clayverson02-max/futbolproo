@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Info } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppHeader } from "@/components/AppHeader";
 import { useSesion } from "@/hooks/useSesion";
@@ -95,6 +95,23 @@ function Dashboard() {
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
             Elige una categoría para entrar en tu plan de entrenamiento. Cada área fue organizada para que sepas exactamente qué desarrollar y por dónde empezar.
           </p>
+        </div>
+
+        <div
+          role="status"
+          aria-live="polite"
+          className="mt-5 flex items-start gap-3 rounded-2xl border border-primary/25 bg-primary/5 p-4 sm:items-center sm:p-5"
+        >
+          <Info className="mt-0.5 size-5 shrink-0 text-primary sm:mt-0" />
+          <div>
+            <p className="text-sm font-bold text-foreground">
+              Estamos actualizando la plataforma
+            </p>
+            <p className="mt-1 text-sm leading-6 text-muted-foreground">
+              En breve todos los videos estarán disponibles dentro de sus respectivas sesiones.
+              Gracias por tu paciencia.
+            </p>
+          </div>
         </div>
 
         <div className="mt-5 grid grid-cols-2 gap-2 sm:max-w-xs sm:gap-3">
